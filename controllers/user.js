@@ -17,7 +17,7 @@ exports.createUser = async (req, res) => {
 			address: req.body.address,
 			phone: req.body.phone,
 			cnic: req.body.cnic,
-			image: req.body.image
+			image: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png'
 		}).save();
 
 		return res.json({
