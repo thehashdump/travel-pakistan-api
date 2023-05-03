@@ -4,8 +4,9 @@ const express = require('express');
 const router = express.Router();
 
 const { createUser, fetchUser } = require('../controllers/user');
+const { verifyDuplicateUsername, verifyUser } = require('../helpers/middlewares');
 
-router.post('/create-user', createUser);
-router.get('/get-user/:id', fetchUser);
+router.post('/sign-up', verifyDuplicateUsername, createUser);
+router.get('/sign-in', verifyUser, fetchUser);
 
 module.exports = router;

@@ -31,7 +31,8 @@ exports.createUser = async (req, res) => {
 /* GET user */
 exports.fetchUser = async (req, res) => {
 	try {
-		const user = await User.findById(req.params.id);
+		const user = await User.findById(req.body.userId);
+		user.password = undefined;
 
 		return res.json({
 			message: 'User fetched successfully',
