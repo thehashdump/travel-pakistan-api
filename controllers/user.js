@@ -2,6 +2,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
+const Organizer = require('../models/organizer');
 const { serverErrorHandler } = require('../helpers/errorHandlers');
 
 /* POST create user */
@@ -31,9 +32,14 @@ exports.createUser = async (req, res) => {
 /* GET user */
 exports.fetchUser = async (req, res) => {
 	try {
-		const user = await User.findById(req.body.userId);
+		let user = await User.findById(req.body.userId);
 		user.password = undefined;
-
+		const organizer = await Organizer.findOne({ owner: req.body.userId });
+		if (organizer) {
+			user = { ...user._doc, organizerId: organizer._id, role: 'organizer' };
+		} else {
+			user = { ...user._doc, role: 'user' };
+		}
 		return res.json({
 			message: 'User fetched successfully',
 			user,
