@@ -22,7 +22,7 @@ exports.verifyUser = async (req, res, next) => {
 exports.verifyDuplicateUsername = async (req, res, next) => {
 	const user = await User.findOne({ username: req.body.username });
 	if (user) {
-		badRequestHandler(res, 'Error: Username already exists', { duplicate_username: true });
+		return badRequestHandler(res, 'Error: Username already exists', { duplicate_username: true });
 	}
 	next();
 };
