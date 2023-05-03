@@ -7,6 +7,6 @@ const { createUser, fetchUser } = require('../controllers/user');
 const { verifyDuplicateUsername, verifyUser } = require('../helpers/middlewares');
 
 router.post('/sign-up', verifyDuplicateUsername, createUser);
-router.get('/sign-in', verifyUser, fetchUser);
+router.post('/sign-in', verifyUser, fetchUser);
 
 module.exports = router;
