@@ -68,7 +68,7 @@ const tourSchema = mongoose.Schema(
 		exclusions: {
 			type: Array, required: true, default: []
 		},
-		tinerary: {
+		itinerary: {
 			type: Object, required: true, default: {}
 		},
 		overview: {

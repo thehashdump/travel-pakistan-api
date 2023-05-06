@@ -14,9 +14,6 @@ const organizerSchema = mongoose.Schema(
 		email: {
 			type: String, trim: true, required: true, unique: true, lowercase: true
 		},
-		password: {
-			type: String, required: true,
-		},
 		tagline: {
 			type: String, trim: true, required: true
 		},
@@ -37,9 +34,6 @@ const organizerSchema = mongoose.Schema(
 		},
 		displayPicture: {
 			type: String, required: true
-		},
-		certificates: {
-			type: Array, required: true, default: []
 		},
 		specialities: {
 			type: Array, required: true, default: []

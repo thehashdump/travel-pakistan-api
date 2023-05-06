@@ -12,8 +12,11 @@ const tourPurchaseSchema = mongoose.Schema(
 			type: mongoose.Types.ObjectId,
 			ref: 'User',
 		},
-		travelers: {
-			type: Object, default: { adults: 1, children: 0, infants: 0 }
+		travellers: {
+			type: Object, default: { adults: 1, children: 0 }
+		},
+		amount: {
+			type: Number, required: true
 		},
 		pickup: {
 			type: String, required: true

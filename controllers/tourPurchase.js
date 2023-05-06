@@ -11,15 +11,17 @@ exports.purchaseTour = async (req, res) => {
 			purchasedTour = await new PurchasedTour({
 				tour: req.body.tour,
 				purchasedBy: req.body.purchasedBy,
-				travelers: req.body.travelers,
+				travellers: req.body.travellers,
 				pickup: req.body.pickup,
+				amount: req.body.amount,
 			}).save();
 		} else {
 			purchasedTour = await new PurchasedTour({
 				tour: req.body.tour,
-				travelers: req.body.travelers,
+				travellers: req.body.travellers,
 				pickup: req.body.pickup,
-				user: req.body.user
+				user: req.body.user,
+				amount: req.body.amount,
 			}).save();
 		}
 
