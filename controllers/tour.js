@@ -83,8 +83,8 @@ exports.getTopTours = async (req, res) => {
 exports.getTour = async (req, res) => {
 	try {
 		let tour = await Tour.findById(req.params.id);
-		const agencyName = await Organizer.find({ owner: tour.organizer }, 'name');
-		tour = { ...tour._doc, agencyName: agencyName[0].name };
+		const agency = await Organizer.find({ owner: tour.organizer }, { name: 1, _id: 1 });
+		tour = { ...tour._doc, agencyName: agency[0].name, agencyId: agency[0]._id };
 		return res.json({
 			message: 'Tour found successfully',
 			tour,
@@ -97,7 +97,8 @@ exports.getTour = async (req, res) => {
 /* GET tours by organizer */
 exports.fetchToursByOrganizer = async (req, res) => {
 	try {
-		const tours = await Tour.find({ organizer: req.params.organizerId });
+		const organizer = await Organizer.findById(req.params.organizerId);
+		const tours = await Tour.find({ organizer: organizer.owner });
 		return res.json({
 			message: 'Tours found successfully',
 			tours,

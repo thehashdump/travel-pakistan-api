@@ -3,6 +3,7 @@
 const Organizer = require('../models/organizer');
 const { serverErrorHandler } = require('../helpers/errorHandlers');
 const Review = require('../models/review');
+const Tour = require('../models/tour');
 
 /* POST create organizer */
 exports.createOrganizer = async (req, res) => {
@@ -86,6 +87,44 @@ exports.getOrganizer = async (req, res) => {
 		return res.json({
 			message: 'Organizer found successfully',
 			organizer,
+		});
+	} catch (err) {
+		return serverErrorHandler(res, 'Error: Unable to find organizer', { organizer_not_found: true }, err);
+	}
+};
+
+/* GET organizer dashboard data */
+exports.getOrganizerDashboardData = async (req, res) => {
+	try {
+		let dashboardData = {
+			totalTours: 0,
+			ticketsSold: 0,
+			ratings: 0,
+			tours: [
+				{
+					name: '',
+					ticketsSold: 0,
+				}
+			],
+		};
+		const organizer = await Organizer.findById(req.params.organizerId);
+		const tours = await Tour.find({ organizer: organizer.owner });
+		const reviews = await Review.find({ organizer: organizer._id });
+		const ticketsSold = tours.reduce((acc, tour) => acc + tour.ticketsPurchased, 0);
+		const ratings = reviews.reduce((acc, review) => acc + review.rating, 0);
+		const avgRating = ratings / reviews.length;
+		dashboardData = {
+			totalTours: tours.length,
+			ticketsSold,
+			ratings: avgRating,
+			tours: tours.map((tour) => ({
+				name: tour.name,
+				ticketsSold: tour.ticketsPurchased,
+			})),
+		};
+		return res.json({
+			message: 'Organizer found successfully',
+			dashboardData,
 		});
 	} catch (err) {
 		return serverErrorHandler(res, 'Error: Unable to find organizer', { organizer_not_found: true }, err);
