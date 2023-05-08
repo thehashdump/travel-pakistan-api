@@ -64,7 +64,7 @@ exports.getTopOrganizers = async (req, res) => {
 					'organizer._id': 1,
 					'organizer.name': 1,
 					'organizer.tripsCompleted': 1,
-					avgRating: 1,
+					avgRating: { $round: ['$avgRating', 1] },
 					'organizer.displayPicture': 1
 				}
 			}
@@ -117,7 +117,7 @@ exports.getOrganizerDashboardData = async (req, res) => {
 		dashboardData = {
 			totalTours: tours.length,
 			ticketsSold,
-			ratings: avgRating,
+			ratings: Math.round(avgRating),
 			tours: tours.map((tour) => ({
 				name: tour.name,
 				ticketsSold: tour.ticketsPurchased,
