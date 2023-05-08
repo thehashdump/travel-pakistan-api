@@ -1,6 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable import/no-extraneous-dependencies */
 const PurchasedTour = require('../models/tourPurchase');
+const Tour = require('../models/tour');
 const { serverErrorHandler } = require('../helpers/errorHandlers');
 
 /* POST purchase tour */
@@ -24,7 +25,10 @@ exports.purchaseTour = async (req, res) => {
 				amount: req.body.amount,
 			}).save();
 		}
-
+		const tour = await Tour.findById(req.body.tour);
+		tour.ticketsPurchased += (parseInt(req.body.travellers.adults, 10) +
+			parseInt(req.body.travellers.children, 10));
+		await tour.save();
 		return res.json({
 			message: 'Tour purchased successfully',
 			purchasedTour,
@@ -37,7 +41,8 @@ exports.purchaseTour = async (req, res) => {
 /* GET tours of user */
 exports.fetchToursOfUser = async (req, res) => {
 	try {
-		const tours = await PurchasedTour.find({ user: req.params.id });
+		console.log(req.params.userId);
+		const tours = await PurchasedTour.find({ purchasedBy: req.params.userId }).populate('tour');
 
 		return res.json({
 			message: 'Tours fetched successfully',

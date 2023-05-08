@@ -108,7 +108,8 @@ exports.getOrganizerDashboardData = async (req, res) => {
 			],
 		};
 		const organizer = await Organizer.findById(req.params.organizerId);
-		const tours = await Tour.find({ organizer: organizer.owner });
+		let tours = await Tour.find({ organizer: organizer.owner });
+		tours = tours.slice(Math.max(tours.length - 5, 0));
 		const reviews = await Review.find({ organizer: organizer._id });
 		const ticketsSold = tours.reduce((acc, tour) => acc + tour.ticketsPurchased, 0);
 		const ratings = reviews.reduce((acc, review) => acc + review.rating, 0);

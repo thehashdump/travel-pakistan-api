@@ -25,7 +25,7 @@ exports.createReview = async (req, res) => {
 /* GET reviews of organizer */
 exports.fetchReviewsOfOrganizer = async (req, res) => {
 	try {
-		const reviews = await Review.find({ organizer: req.params.organizerId });
+		const reviews = await Review.find({ organizer: req.params.organizerId }).populate('user');
 
 		return res.json({
 			message: 'Reviews fetched successfully',
