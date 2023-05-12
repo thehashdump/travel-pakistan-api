@@ -55,7 +55,8 @@ exports.searchTour = async (req, res) => {
 			destination: { $regex: new RegExp(destination, 'i') },
 			departureLocation: { $regex: new RegExp(pickup, 'i') },
 			durationDays: { $gte: parseInt(days, 10) },
-			capacity: { $gte: parseInt(people, 10) }
+			capacity: { $gte: parseInt(people, 10) },
+			active: true,
 		});
 		return res.json({
 			message: 'Tours found successfully',
@@ -69,7 +70,7 @@ exports.searchTour = async (req, res) => {
 /* GET top tours */
 exports.getTopTours = async (req, res) => {
 	try {
-		const tours = await Tour.find().sort({ ticketsPurchased: -1 }).limit(3);
+		const tours = await Tour.find({ active: true }).sort({ ticketsPurchased: -1 }).limit(3);
 		return res.json({
 			message: 'Tours found successfully',
 			tours,

@@ -117,7 +117,7 @@ exports.getOrganizerDashboardData = async (req, res) => {
 		dashboardData = {
 			totalTours: tours.length,
 			ticketsSold,
-			ratings: Math.round(avgRating),
+			ratings: avgRating.toFixed(1),
 			tours: tours.map((tour) => ({
 				name: tour.name,
 				ticketsSold: tour.ticketsPurchased,
