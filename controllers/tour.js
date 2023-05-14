@@ -204,3 +204,23 @@ exports.suggestMeTour = async (req, res) => {
 		tours: filteredTours,
 	});
 };
+
+// fetch all tours
+exports.fetchAllTours = async (req, res) => {
+	try {
+		let tours = await Tour.find();
+		tours = await Promise.all(
+			tours.map(async (tour) => {
+				const agency = await Organizer.findOne({ owner: tour.organizer }, { name: 1 });
+				const agencyName = agency ? agency.name : null;
+				return { ...tour._doc, agencyName };
+			})
+		);
+		return res.json({
+			message: 'Tours found successfully',
+			tours,
+		});
+	} catch (err) {
+		return serverErrorHandler(res, 'Error: Unable to get tours', { get_tours_failed: true }, err);
+	}
+};

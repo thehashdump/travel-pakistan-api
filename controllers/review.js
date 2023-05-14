@@ -35,3 +35,17 @@ exports.fetchReviewsOfOrganizer = async (req, res) => {
 		return serverErrorHandler(res, 'Error: Unable to fetch reviews', { fetch_reviews_failed: true }, err);
 	}
 };
+
+// fetch all reviews
+exports.fetchAllReviews = async (req, res) => {
+	try {
+		const reviews = await Review.find({}).populate('user').populate('organizer');
+
+		return res.json({
+			message: 'Reviews fetched successfully',
+			reviews,
+		});
+	} catch (err) {
+		return serverErrorHandler(res, 'Error: Unable to fetch reviews', { fetch_reviews_failed: true }, err);
+	}
+};
