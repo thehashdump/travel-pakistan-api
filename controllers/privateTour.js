@@ -94,3 +94,16 @@ exports.acceptBid = async (req, res) => {
 		return serverErrorHandler(res, 'Error: Unable to book private tour', { book_private_tour_failed: true }, err);
 	}
 };
+
+// fetch All private tours for admin
+exports.fetchAllPrivateToursForAdmin = async (req, res) => {
+	try {
+		const privateTours = await PrivateTour.find({}).populate('user').populate('organizer');
+		return res.json({
+			message: 'Private tours fetched successfully',
+			privateTours,
+		});
+	} catch (err) {
+		return serverErrorHandler(res, 'Error: Unable to fetch private tours', { fetch_private_tours_failed: true }, err);
+	}
+};
