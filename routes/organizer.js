@@ -8,11 +8,13 @@ const {
 	getTopOrganizers,
 	getOrganizer,
 	getOrganizerDashboardData,
+	getPurchasedTickets,
 } = require('../controllers/organizer');
 
 router.post('/create-organizer', createOrganizer);
 router.get('/top-organizers', getTopOrganizers);
 router.get('/organizers/:organizerId', getOrganizer);
 router.get('/organizer-dashboard/:organizerId', getOrganizerDashboardData);
+router.get('/organizer-purchased-tickets/:organizerId', getPurchasedTickets);
 
 module.exports = router;

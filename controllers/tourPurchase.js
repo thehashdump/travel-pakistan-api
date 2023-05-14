@@ -41,7 +41,6 @@ exports.purchaseTour = async (req, res) => {
 /* GET tours of user */
 exports.fetchToursOfUser = async (req, res) => {
 	try {
-		console.log(req.params.userId);
 		const tours = await PurchasedTour.find({ purchasedBy: req.params.userId }).populate('tour');
 
 		return res.json({
@@ -50,5 +49,27 @@ exports.fetchToursOfUser = async (req, res) => {
 		});
 	} catch (err) {
 		return serverErrorHandler(res, 'Error: Unable to fetch tours', { fetch_tours_failed: true }, err);
+	}
+};
+
+/* POST cancel booking */
+exports.cancelBooking = async (req, res) => {
+	try {
+		const purchasedTour = await PurchasedTour.find({
+			purchasedBy: req.body.purchasedBy,
+			tour: req.body.tour._id,
+			pickup: req.body.pickup,
+			amount: req.body.amount,
+		});
+		const tour = await Tour.findById(req.body.tour._id);
+		tour.ticketsPurchased -= (parseInt(req.body.travellers.adults, 10) +
+		parseInt(req.body.travellers.children, 10));
+		await tour.save();
+		await PurchasedTour.findByIdAndDelete(purchasedTour[0]._id);
+		return res.json({
+			message: 'Booking canceled successfully',
+		});
+	} catch (err) {
+		return serverErrorHandler(res, 'Error: Unable to cancel booking', { cancel_booking_failed: true }, err);
 	}
 };

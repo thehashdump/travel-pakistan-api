@@ -4,6 +4,7 @@ const Organizer = require('../models/organizer');
 const { serverErrorHandler } = require('../helpers/errorHandlers');
 const Review = require('../models/review');
 const Tour = require('../models/tour');
+const PurchasedTour = require('../models/tourPurchase');
 
 /* POST create organizer */
 exports.createOrganizer = async (req, res) => {
@@ -117,7 +118,7 @@ exports.getOrganizerDashboardData = async (req, res) => {
 		dashboardData = {
 			totalTours: tours.length,
 			ticketsSold,
-			ratings: Math.round(avgRating),
+			ratings: avgRating.toFixed(1),
 			tours: tours.map((tour) => ({
 				name: tour.name,
 				ticketsSold: tour.ticketsPurchased,
@@ -126,6 +127,26 @@ exports.getOrganizerDashboardData = async (req, res) => {
 		return res.json({
 			message: 'Organizer found successfully',
 			dashboardData,
+		});
+	} catch (err) {
+		return serverErrorHandler(res, 'Error: Unable to find organizer', { organizer_not_found: true }, err);
+	}
+};
+
+// GET organizer purchased tickets
+exports.getPurchasedTickets = async (req, res) => {
+	try {
+		const organizer = await Organizer.findById(req.params.organizerId);
+		const tours = await Tour.find({ organizer: organizer.owner });
+		let purchasedTickets = await PurchasedTour.find().sort({ createdAt: -1 })
+			.populate('tour')
+			.populate('purchasedBy');
+		purchasedTickets = purchasedTickets.filter(
+			(ticket) => tours.some((tour) => tour._id.toString() === ticket.tour._id.toString())
+		);
+		return res.json({
+			message: 'Organizer found successfully',
+			purchasedTickets,
 		});
 	} catch (err) {
 		return serverErrorHandler(res, 'Error: Unable to find organizer', { organizer_not_found: true }, err);
