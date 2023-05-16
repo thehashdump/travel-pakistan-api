@@ -55,21 +55,41 @@ exports.fetchToursOfUser = async (req, res) => {
 /* POST cancel booking */
 exports.cancelBooking = async (req, res) => {
 	try {
-		const purchasedTour = await PurchasedTour.find({
+		const purchasedTour = await PurchasedTour.findOne({
 			purchasedBy: req.body.purchasedBy,
 			tour: req.body.tour._id,
 			pickup: req.body.pickup,
 			amount: req.body.amount,
 		});
+
+		if (!purchasedTour) {
+			return res.status(404).json({ error: 'Purchased tour not found' });
+		}
+
 		const tour = await Tour.findById(req.body.tour._id);
-		tour.ticketsPurchased -= (parseInt(req.body.travellers.adults, 10) +
-		parseInt(req.body.travellers.children, 10));
+
+		if (!tour) {
+			return res.status(404).json({ error: 'Tour not found' });
+		}
+
+		const adults = parseInt(purchasedTour.travellers.adults, 10) || 0;
+		const children = parseInt(purchasedTour.travellers.children, 10) || 0;
+		const ticketsToRefund = adults + children;
+
+		if (tour.ticketsPurchased < ticketsToRefund) {
+			return res.status(400).json({ error: 'Invalid number of tickets to refund' });
+		}
+
+		tour.ticketsPurchased -= ticketsToRefund;
 		await tour.save();
-		await PurchasedTour.findByIdAndDelete(purchasedTour[0]._id);
+
+		await PurchasedTour.findByIdAndDelete(purchasedTour._id);
+
 		return res.json({
 			message: 'Booking canceled successfully',
 		});
 	} catch (err) {
-		return serverErrorHandler(res, 'Error: Unable to cancel booking', { cancel_booking_failed: true }, err);
+		console.error(err);
+		return res.status(500).json({ error: 'Unable to cancel booking' });
 	}
 };
