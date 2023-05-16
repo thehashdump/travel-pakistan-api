@@ -48,3 +48,48 @@ exports.fetchUser = async (req, res) => {
 		return serverErrorHandler(res, 'Error: Unable to fetch user', { fetch_user_failed: true }, err);
 	}
 };
+
+exports.fetchUsersGraphData = async (req, res) => {
+	try {
+		const users = await User.find({}).select('createdAt');
+		const currentDate = new Date();
+		const usersGraphData = [];
+
+		for (let i = 4; i >= 0; i -= 1) {
+			const month = currentDate.getMonth() - i;
+			const year = currentDate.getFullYear();
+			const monthName = new Date(year, month).toLocaleString('default', { month: 'long' });
+
+			let usersCount = 0;
+			users.forEach((user) => {
+				const userMonth = new Date(user.createdAt).getMonth();
+				const userYear = new Date(user.createdAt).getFullYear();
+				if (userMonth === month && userYear === year) {
+					usersCount += 1;
+				}
+			});
+
+			usersGraphData.push({ name: monthName, users: usersCount });
+		}
+
+		return res.json({
+			message: 'Users graph data fetched successfully',
+			usersGraphData,
+		});
+	} catch (err) {
+		return serverErrorHandler(res, 'Error: Unable to fetch users graph data', { fetch_users_graph_data_failed: true }, err);
+	}
+};
+
+// fetch all users
+exports.fetchAllUsers = async (req, res) => {
+	try {
+		const users = await User.find({}).select('username email address phone cnic');
+		return res.json({
+			message: 'Users fetched successfully',
+			users,
+		});
+	} catch (err) {
+		return serverErrorHandler(res, 'Error: Unable to fetch users', { fetch_users_failed: true }, err);
+	}
+};

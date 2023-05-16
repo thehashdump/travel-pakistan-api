@@ -93,3 +93,16 @@ exports.cancelBooking = async (req, res) => {
 		return res.status(500).json({ error: 'Unable to cancel booking' });
 	}
 };
+
+// fetch all purchased tours
+exports.fetchALLPurchasedTours = async (req, res) => {
+	try {
+		const purchasedTours = await PurchasedTour.find({}).populate('tour').populate('purchasedBy');
+		return res.json({
+			message: 'Purchased tours fetched successfully',
+			purchasedTours,
+		});
+	} catch (err) {
+		return serverErrorHandler(res, 'Error: Unable to fetch purchased tours', { fetch_purchased_tours_failed: true }, err);
+	}
+};

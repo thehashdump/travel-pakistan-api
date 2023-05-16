@@ -4,6 +4,7 @@ const Organizer = require('../models/organizer');
 const { serverErrorHandler } = require('../helpers/errorHandlers');
 const Review = require('../models/review');
 const Tour = require('../models/tour');
+const User = require('../models/user');
 const PurchasedTour = require('../models/tourPurchase');
 
 /* POST create organizer */
@@ -152,3 +153,69 @@ exports.getPurchasedTickets = async (req, res) => {
 		return serverErrorHandler(res, 'Error: Unable to find organizer', { organizer_not_found: true }, err);
 	}
 };
+
+exports.fetchOrganizersGraphData = async (req, res) => {
+	try {
+		const organizers = await Organizer.find({}).select('createdAt');
+		const currentDate = new Date();
+		const organizerGraphData = [];
+
+		for (let i = 4; i >= 0; i -= 1) {
+			const month = currentDate.getMonth() - i;
+			const year = currentDate.getFullYear();
+			const monthName = new Date(year, month).toLocaleString('default', { month: 'long' });
+
+			let organizersCount = 0;
+			organizers.forEach((organizer) => {
+				const organizerMonth = new Date(organizer.createdAt).getMonth();
+				const organizerYear = new Date(organizer.createdAt).getFullYear();
+				if (organizerMonth === month && organizerYear === year) {
+					organizersCount += 1;
+				}
+			});
+
+			organizerGraphData.push({ name: monthName, organizers: organizersCount });
+		}
+
+		return res.json({
+			message: 'Organizer graph data fetched successfully',
+			organizerGraphData,
+		});
+	} catch (err) {
+		return serverErrorHandler(res, 'Error: Unable to fetch organizer graph data', { fetch_organizer_graph_data_failed: true }, err);
+	}
+};
+
+// fetch widget data
+exports.fetchWidgetsData = async (req, res) => {
+	try {
+		const organizers = await Organizer.find({});
+		const users = await User.find({});
+		const tours = await Tour.find({});
+
+		return res.json({
+			message: 'Widgets data fetched successfully',
+			widgetsData: {
+				organizers: organizers.length,
+				tours: tours.length,
+				users: users.length,
+			},
+		});
+	} catch (err) {
+		return serverErrorHandler(res, 'Error: Unable to fetch widgets data', { fetch_widgets_data_failed: true }, err);
+	}
+};
+
+// fetch all organizers
+exports.fetchAllOrganizers = async (req, res) => {
+	try {
+		const organizers = await Organizer.find({}).populate('owner');
+
+		return res.json({
+			message: 'Organizers fetched successfully',
+			organizers,
+		});
+	} catch (err) {
+		return serverErrorHandler(res, 'Error: Unable to fetch organizers', { fetch_organizers_failed: true }, err);
+	}
+}
